@@ -93,13 +93,13 @@ class BMIAITwitterSentiment:
         #    print(count, tag)
 
         # Initialize a Random Forest classifier with 100 trees
-        self.forest = RandomForestClassifier(n_estimators = 100, verbose=3, n_jobs=2)
+        self.forest = RandomForestClassifier(n_estimators = 100, verbose=3, n_jobs=-2)
 
         # Fit the forest to the training set, using the bag of words as
         # features and the sentiment labels as the response variable
         #
         # This may take a few minutes to run
-        self.forest = self.forest.fit( train_data_features, training_data["SentimentText"] )
+        self.forest = self.forest.fit( train_data_features, training_data["Sentiment"] )
 
         # Output the forest
         pickle.dump(self.forest, open("forest.sav", "wb"))
