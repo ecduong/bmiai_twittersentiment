@@ -42,9 +42,8 @@ class BMIAITwitterSentiment:
     # Trains a random forest bag of words, and saves a copy of the vectorizer and
     # random forest as files for future importing
     # Parameters: path_to_training_data_csv - path to CSV file for training
-    #             path_to_testing_data_csv - path to CSV file for testing
-    # Returns: nothing
-    def train_data_get_random_forest( self, path_to_training_data_csv ):
+    # Returns: none
+    def train_data( self, path_to_training_data_csv ):
         # Read the CSV file for training
         training_data = pd.read_csv(path_to_training_data_csv, encoding='ISO-8859-1')
 
@@ -106,10 +105,14 @@ class BMIAITwitterSentiment:
         pickle.dump(self.forest, open("forest.sav", "wb"))
 
 
+    # Test the provided path_data against the random forest. Requires that
+    # both the random forest and vectorizer is set. Outputs the results of the testing
+    # Parameters: path_to_testing_data_csv - the path toe the CSV file for testing
+    # Returns: none
     def test_data( self, path_to_testing_data_csv ):
         testing_data = pd.read_csv(path_to_testing_data_csv, encoding='ISO-8859-1')
 
-         # Clean each Tweet so that each word can be analyzed
+        # Clean each Tweet so that each word can be analyzed
         cleaned_tweets_testing = []
         for tweet in testing_data["SentimentText"]:
             cleaned_tweets_testing.append(self.review_to_words(tweet))
@@ -128,6 +131,11 @@ class BMIAITwitterSentiment:
         # Use pandas to write the comma-separated output file
         output.to_csv( "Bag_of_Words_model.csv", index=False, quoting=3 )
 
-    def load_vectorizer_and_random_forest( self, path_to_vectorizer_sav, path_to_random_forestsav):
-        self.vectorizer = pickle.load(open("vectorizer.sav", "rb"))
-        self.forest = pickle.load(open("forest.sav", "rb"))
+    # Loads a saved vectorizer and a saved random forest so we can use those instead of
+    # having to train the model over and over again
+    # Parameters: path_to_vectorizer_sav - the .sav file for the vectorizer
+    #             path_to_forest_sav - the .sav file for the random forest
+    # Returns: none
+    def load_vectorizer_and_random_forest( self, path_to_vectorizer_sav, path_to_forest_sav):
+        self.vectorizer = pickle.load(open(path_to_vectorizer_sav, "rb"))
+        self.forest = pickle.load(open(path_to_forest_sav, "rb"))
