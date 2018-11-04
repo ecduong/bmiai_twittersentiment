@@ -6,29 +6,32 @@ import nltk
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.pipeline import Pipeline
+from sklearn.ensemble import RandomForestClassifier
 #import tflearn
 #from tflearn.data_utils import to_categorical, pad_sequences
 
 # Input data files are available in the "../input/" directory.
 
 # Any results you write to the current directory are saved as output.
+PATH_TO_TRAINING_DATA = "../data/train.csv"
+PATH_TO_TESTING_DATA = "../data/test.csv"
 #Dataset loading
-train = pd.read_csv("C:/Users/Edm/Downloads/all/train.csv", encoding = "ISO-8859-1")
-test = pd.read_csv("C:/Users/Edm/Downloads/all/test.csv", encoding = "ISO-8859-1")
+train = pd.read_csv(PATH_TO_TRAINING_DATA, encoding = "ISO-8859-1")
+test = pd.read_csv(PATH_TO_TESTING_DATA, encoding = "ISO-8859-1")
 
 ##########################################################################################
 #simple cleaning text example!
-train1 = BeautifulSoup(train["SentimentText"][171], "lxml")
-print(train1.get_text())
-letters_only = re.sub("[^a-zA-Z]"," ", train1.get_text()) #decide on whether to change it to include alphanumerical
+#train1 = BeautifulSoup(train["SentimentText"][171], "lxml")
+#print(train1.get_text())
+#letters_only = re.sub("[^a-zA-Z]"," ", train1.get_text()) #decide on whether to change it to include alphanumerical
 
-lower_case = letters_only.lower()
-words = lower_case.split()
+#lower_case = letters_only.lower()
+#words = lower_case.split()
 
-print(letters_only)
+#print(letters_only)
 
-words = [w for w in words if not w in stopwords.words("english")]
-print(words)
+#words = [w for w in words if not w in stopwords.words("english")]
+#print(words)
 
 def tweets_to_words(raw_tweets):
     #1. Remove HTML
@@ -79,11 +82,9 @@ vectorizer = CountVectorizer(analyzer = "word", \
                              stop_words = None, \
                              max_features = 5000 #might need to decrease this number later
                             )
-print("Training the random forest...")
-from sklearn.ensemble import RandomForestClassifier
 
 #Initialize a Random Forest Classifier with 100 trees will probably lagg your computer LOL runs very slow took 18mins
-forest = RandomForestClassifier(n_estimators = 100,verbose=3,n_jobs=-2)
+#forest = RandomForestClassifier(n_estimators = 100,verbose=3,n_jobs=-2)
 
 #fit_transform(): fits model and learns vocabulary and transform our training data into feature vectors.
 #input to fit_transform should be a list of strings.
@@ -94,11 +95,11 @@ train_data_features = train_data_features.toarray()
 
 ########################################################################################
 
-#print("Training the random forest...")
+print("Training the random forest...")
 #from sklearn.ensemble import RandomForestClassifier
 
 #Initialize a Random Forest Classifier with 100 trees will probably lagg your computer LOL runs very slow took 18mins
-#forest = RandomForestClassifier(n_estimators = 100,verbose=3,n_jobs=-2)
+forest = RandomForestClassifier(n_estimators = 100,verbose=3,n_jobs=-2)
 
 
 #fit the forest to the training set, using the bag of words as 
@@ -129,10 +130,10 @@ result = forest.predict(test_data_features)
 
 # Copy the results to a pandas dataframe with an "id" column and
 # a "sentiment" column
-output = pd.DataFrame( data={"ID":test["ItemID"], "Sentiment":result} )
+output = pd.DataFrame( data={"ItemID":test["ItemID"], "Sentiment":result} )
 
 # Use pandas to write the comma-separated output file
-output.to_csv( "Bag_of_Words_model.csv", index=False, quoting=3 )
+output.to_csv( "submission.csv", index=False, quoting=3 )
 
 
 
